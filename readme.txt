@@ -1,5 +1,7 @@
-Please see the wiki pages for instructions on how to install and use.
+Roscopter code used for ARL SCOPE Project 2014
 
-Note that there is a mavlink submodule included in this repository that may need updated at certain times.
+Forked from https://github.com/epsilonorion/roscopter
 
-Please feel free to write about any problems or suggestions and I will be happy to add them to the code.
+Team members: Elizabeth Duncan, Kyle McConnaughay, Eric Schneider, Charles Goddard, Heather Boortz, and Katilin Gallagher
+
+Go to https://github.com/epsilonorion/roscopter/wiki for installation instructions
