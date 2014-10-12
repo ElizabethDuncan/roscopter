@@ -13,6 +13,9 @@ import driver
  # Params:  data: Requested command variable
 #*******************************************************************************
 def start_mission(req):
+	print req
+	if req.command == roscopter.srv.XBEECommand.STARTMISSION:
+		driver.goto_waypoint()	
 
 
 ##******************************************************************************
