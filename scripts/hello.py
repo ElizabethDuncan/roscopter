@@ -129,8 +129,26 @@ def return_control():
 		return False
 
 
+def start_mission():
+	rospy.loginfo("in start mission")
+	rospy.wait_for_service('mission')
+	try:
+		print "trying to start mission"
+		mission = rospy.ServiceProxy('mission', roscopter.srv.XBEECommand)
+		res = mission(1)
+		print type(res), res
+		if str(res) == "result: True":
+			print "successfully started mission"
+			return True
+		else:
+			print "error starting mission"
+			return False
+	except rospy.ServiceException, e:
+		return False
+
+
 if __name__ == "__main__":
-	if goto_waypoint():
+	if arm() and land() and send_waypoint():
 		print "mission successfull"
 	else:
 		return_control()
