@@ -12,7 +12,7 @@ import xmlrpclib
 #import driver
 
 def arm():
-	print "in arm"
+	rospy.loginfo("in arm")
 	rospy.wait_for_service('command')
 	try:
 		print "trying to arm"
@@ -81,8 +81,9 @@ def send_waypoint():
 	rospy.wait_for_service('waypoint')
 	try:
 		send_waypoint_command = rospy.ServiceProxy('waypoint', roscopter.srv.SendWaypoint)
-		#clear_waypoint_command = rospy.ServiceProxy('waypoint', roscopter.src.ClearWaypoint)
-		waypoint1 = {latitude: 42.2914092, longitude: -71.2624439, altitude: 5000, pos_acc: 10, speed_to: 10, hold_time: 10, yaw_from: 10, pan_angle: 10, tilt_angle: 10, waypoint_type: 1}		
+		waypoint1 = {latitude: 42.2914092, longitude: -71.2624439, altitude: 5000, 
+					 pos_acc: 10, speed_to: 10, hold_time: 10, yaw_from: 10, 
+					 pan_angle: 10, tilt_angle: 10, waypoint_type: 1}		
 		res = send_waypoint_command(waypoint1)
 		if str(res) == "result: True":
 			print "successfully sent waypoint"
@@ -105,11 +106,11 @@ def gps_received(data):
 	print "gps data: " + str(data)
 
 def get_gps():
-		rospy.wait_for_topic('gps')
-		try:
-			rospy.Subscriber("gps", TBD, gps_received)
-		except rospy.ServiceException, e:
-			return False
+	rospy.wait_for_topic('gps')
+	try:
+		rospy.Subscriber("gps", TODO, gps_received)
+	except rospy.ServiceException, e:
+		return False
 
 
 def return_control():
@@ -127,27 +128,11 @@ def return_control():
 	except rospy.ServiceException, e:
 		return False
 
-# START MISSION
-def goto_waypoint():
-    master.mav.command_long_send(master.target_system, master.target_component,
-                                 mavutil.mavlink.MAV_CMD_MISSION_START, 0, 0,
-                                 0, 0, 0,
-                                 0, 0, 0)
-
-##******************************************************************************
- # Name:    clear_waypoints
- # Purpose: Clear all stored waypoints from the APM
-#*******************************************************************************
-# def clear_waypoints():
-#     master.mav.mission_clear_all_send(master.target_system, master.target_component)
-#     rospy.loginfo ("Clear Waypoints")
 
 if __name__ == "__main__":
-
-	#clear_waypoints()
-
 	if goto_waypoint():
 		print "mission successfull"
 	else:
 		return_control()
 		print "mission failure"
+		
