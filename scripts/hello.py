@@ -65,14 +65,11 @@ from collections import namedtuple
 Waypoint = namedtuple('Waypoint', 'latitude longitude altitude pos_acc speed_to hold_time yaw_from pan_angle tilt_angle waypoint_type')
 
 
-def send_waypoint():
+def send_waypoint(wp):
 	print "in send waypoint"
 	rospy.wait_for_service('waypoint')
 	try:
-		#wp = {'latitude': 42.2914092, 'longitude': -71.2624439, 'altitude': 5000, 'pos_acc': 10, 'speed_to': 10, 'hold_time': 10, 'yaw_from': 10, 'pan_angle': 10, 'tilt_angle': 10, 'waypoint_type': 1}
-		wp = Waypoint(42.2914092, -71.2624439, 5000, 10, 10, 10, 10, 10, 10, 1)
 		send_waypoint_command = rospy.ServiceProxy('waypoint', roscopter.srv.SendWaypoint)
-		#waypoint1 = "waypoint: {latitude: 42.2914092, longitude: -71.2624439, altitude: 5000, pos_acc: 10, speed_to: 10, hold_time: 10, yaw_from: 10, pan_angle: 10, tilt_angle: 10, waypoint_type: 1}"		
 		res = send_waypoint_command(wp)
 		print 'res:', res
 		if str(res) == "result: True":
@@ -91,14 +88,26 @@ def send_waypoint():
 		return False
 
 
+def use_gps_to_set_waypoint():
+	gps = get_gps()
+	# Create new  Waypoint
+    new_wp = roscopter.msg.Waypoint()
+    #increment latitiude by just a little
+    new_wp.latitude = gps.latitude + 0.0001
+    new_wp.longitude = gps.longitude
+    new_wp.altitude = gps
+    new_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_NAV
+
+    send_waypoint(new_wp)
 
 def gps_received(data):
-	print "gps data: " + str(data)
+	return data
 
 def get_gps():
 	rospy.wait_for_topic('gps')
 	try:
-		rospy.Subscriber("gps", TODO, gps_received)
+		message = rospy.Subscriber("gps", NavSatFix, gps_received)
+		return message
 	except rospy.ServiceException, e:
 		return False
 
@@ -138,7 +147,10 @@ def start_mission():
 
 
 if __name__ == "__main__":
-	if arm() and launch() and send_waypoint() and start_mission():
+
+	wp = Waypoint(42.2914092, -71.2624439, 5000, 10, 10, 10, 10, 10, 10, 1)
+
+	if arm() and launch() and use_gps_to_set_waypoint() and start_mission():
 		print "mission successfull"
 	else:
 		return_control()
