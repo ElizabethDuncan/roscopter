@@ -28,21 +28,6 @@ def arm():
 	except rospy.ServiceException, e:
 		return False
 
-def dearm():
-	print "in dearm"
-	rospy.wait_for_service('command')
-	try:
-		command = rospy.ServiceProxy('command', roscopter.srv.APMCommand)
-		res = command(4)
-		if str(res) == "result: True":
-			print "successfully dearming"
-			return True
-		else:
-			print "error dearming"
-			return False
-	except rospy.ServiceException, e:
-		return False
-
 # TODO look at the launch code - how high is it going to go
 def launch():
 	print "in launch"
@@ -65,8 +50,8 @@ def land():
 	print "in land"
 	rospy.wait_for_service('command')
 	try:
-		command = rospy.ServiceProxy('command', roscopter.srv.APMCommand)
-		res = command(2)
+		command = rospy.ServiceProxy('land', roscopter.srv.XBEECommand)
+		res = command(1)
 		if str(res) == "result: True":
 			print "successfully landing"
 			return True
@@ -76,21 +61,26 @@ def land():
 	except rospy.ServiceException, e:
 		return False
 
+from collections import namedtuple
+Waypoint = namedtuple('Waypoint', 'latitude longitude altitude pos_acc speed_to hold_time yaw_from pan_angle tilt_angle waypoint_type')
+
+
 def send_waypoint():
 	print "in send waypoint"
 	rospy.wait_for_service('waypoint')
 	try:
+		#wp = {'latitude': 42.2914092, 'longitude': -71.2624439, 'altitude': 5000, 'pos_acc': 10, 'speed_to': 10, 'hold_time': 10, 'yaw_from': 10, 'pan_angle': 10, 'tilt_angle': 10, 'waypoint_type': 1}
+		wp = Waypoint(42.2914092, -71.2624439, 5000, 10, 10, 10, 10, 10, 10, 1)
 		send_waypoint_command = rospy.ServiceProxy('waypoint', roscopter.srv.SendWaypoint)
-		waypoint1 = {latitude: 42.2914092, longitude: -71.2624439, altitude: 5000, 
-					 pos_acc: 10, speed_to: 10, hold_time: 10, yaw_from: 10, 
-					 pan_angle: 10, tilt_angle: 10, waypoint_type: 1}		
-		res = send_waypoint_command(waypoint1)
+		#waypoint1 = "waypoint: {latitude: 42.2914092, longitude: -71.2624439, altitude: 5000, pos_acc: 10, speed_to: 10, hold_time: 10, yaw_from: 10, pan_angle: 10, tilt_angle: 10, waypoint_type: 1}"		
+		res = send_waypoint_command(wp)
+		print 'res:', res
 		if str(res) == "result: True":
 			print "successfully sent waypoint"
 			return True
 		else:
 			#Try one more time to send waypoint
-			res = command(waypoint1)
+			res = send_waypoint_command(wp)
 			if str(res) == "result: True":
 				print "successfully sent waypoint"
 				return True
@@ -148,7 +138,7 @@ def start_mission():
 
 
 if __name__ == "__main__":
-	if arm() and land() and send_waypoint():
+	if arm() and launch() and send_waypoint() and start_mission():
 		print "mission successfull"
 	else:
 		return_control()

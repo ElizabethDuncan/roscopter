@@ -784,15 +784,16 @@ def launch():
     
 # Land the vehicle
 def land():
-    pass
-#    master.mav.rc_channels_override_send(master.target_system, master.target_component, 65535, 65535, 1150, 65535, 65535, 65535, 65535, 65535)
+    print "overwrite rc..."
+    master.mav.rc_channels_override_send(master.target_system, master.target_component, 65535, 65535, 1150, 65535, 65535, 65535, 65535, 65535)
 
-#    # Land Command
-#    master.mav.command_long_send(master.target_system, master.target_component,
-#                                 mavutil.mavlink.MAV_CMD_NAV_LAND, 0, 0,
-#                                 0, 0, 0,
-#                                 0, 0, 0)
-#    rospy.loginfo ("Land Command")
+    print "master command sent..."
+    # Land Command
+    master.mav.command_long_send(master.target_system, master.target_component,
+                                mavutil.mavlink.MAV_CMD_NAV_LAND, 0, 0,
+                                0, 0, 0,
+                                0, 0, 0)
+    rospy.loginfo ("Land Command")
 
 watchdog_time = 0
 

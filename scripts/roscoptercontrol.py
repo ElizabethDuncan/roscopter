@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+import rospy
+from std_msgs.msg import String, Header, Bool
+from std_srvs.srv import *
+from sensor_msgs.msg import NavSatFix, NavSatStatus, Imu
+import roscopter.msg
+import roscopter.srv
+import sys,struct,time,os
+import math
 import driver
 
 
@@ -14,15 +22,19 @@ import driver
 #*******************************************************************************
 def start_mission(req):
 	print req
+	driver.goto_waypoint()
+
+def land_it(req):
 	if req.command == roscopter.srv.XBEECommand.STARTMISSION:
-		driver.goto_waypoint()	
+		driver.land()	
 
 
 ##******************************************************************************
 # Services for APM Commands
 #*******************************************************************************
 # Allow for commands such as Arm, Disarm, Launch, Land, etc.
-rospy.Service("mission", roscopter.srv.XBEECommand, start_mission)
+rospy.Service("mission", roscopter.srv.APMCommand, start_mission)
+rospy.Service("land", roscopter.srv.XBEECommand, land_it)
 
 
 if __name__ == '__main__':
