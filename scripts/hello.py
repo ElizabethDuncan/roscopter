@@ -124,9 +124,9 @@ def start_mission():
 	rospy.wait_for_service('mission')
 	try:
 		print "trying to start mission"
-		mission = rospy.ServiceProxy('mission', roscopter.srv.XBEECommand)
+		mission = rospy.ServiceProxy('mission', roscopter.srv.APMCommand)
 		res = mission(1)
-		print type(res), res
+		print 'res:', res
 		if str(res) == "result: True":
 			print "successfully started mission"
 			return True

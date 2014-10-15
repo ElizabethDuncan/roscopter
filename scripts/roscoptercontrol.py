@@ -23,6 +23,7 @@ import driver
 def start_mission(req):
 	print req
 	driver.goto_waypoint()
+	return True
 
 def land_it(req):
 	if req.command == roscopter.srv.XBEECommand.STARTMISSION:
