@@ -15,7 +15,7 @@ import driver
  # Purpose: Callback function for "mission" Service.  Specific commands are used
  #              to control functions such as Start mission, finish mission and 
  #				failsafe.
- #              All commands may be found within the "XCEECommand" Service file.
+ #              All commands may be found within the "XBEECommand" Service file.
  #              New commands should be entered there to keep uniform constants
  #              throughout calling functions
  # Params:  data: Requested command variable
