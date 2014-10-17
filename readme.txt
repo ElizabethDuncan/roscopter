@@ -1,4 +1,4 @@
-Roscopter code used for ARL SCOPE Project 2014
+Roscopter code used for ARL SCOPE Project 2014, video streaming quadcopters
 
 Forked from https://github.com/epsilonorion/roscopter
 
