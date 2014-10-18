@@ -49,8 +49,10 @@ def land():
     print "in land"
     rospy.wait_for_service('command')
     try:
+    	print "sending land command"
         command = rospy.ServiceProxy('land', Empty)
         res = command()
+        print 'res:', res
         if str(res) == "result: True":
             print "successfully landing"
             return True
