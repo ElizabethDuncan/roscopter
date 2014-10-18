@@ -45,13 +45,27 @@ def launch():
 	except rospy.ServiceException, e:
 		return False
 
-
 def land():
 	print "in land"
 	rospy.wait_for_service('command')
 	try:
-		command = rospy.ServiceProxy('land', roscopter.srv.XBEECommand)
-		res = command(1)
+		command = rospy.ServiceProxy('land', Empty)
+		res = command()
+		if str(res) == "result: True":
+			print "successfully landing"
+			return True
+		else:
+			print "error landing"
+			return False
+	except rospy.ServiceException, e:
+		return False
+
+def land_failsafe():
+	print "in land_failsafe"
+	rospy.wait_for_service('command')
+	try:
+		command = rospy.ServiceProxy('land_failsafe', Empty)
+		res = command()
 		if str(res) == "result: True":
 			print "successfully landing"
 			return True

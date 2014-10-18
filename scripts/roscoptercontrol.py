@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String, Header, Bool
-from std_srvs.srv import *
+from std_srvs.srv import Empty
 from sensor_msgs.msg import NavSatFix, NavSatStatus, Imu
 import roscopter.msg
 import roscopter.srv
@@ -14,28 +14,32 @@ import driver
  # Name:    start_mission
  # Purpose: Callback function for "mission" Service.  Specific commands are used
  #              to control functions such as Start mission, finish mission and 
- #				failsafe.
- #              All commands may be found within the "XBEECommand" Service file.
+ #              failsafe.
+ #              All commands may be found within the "XCEECommand" Service file.
  #              New commands should be entered there to keep uniform constants
  #              throughout calling functions
  # Params:  data: Requested command variable
 #*******************************************************************************
 def start_mission(req):
-	print req
-	driver.goto_waypoint()
-	return True
+    print req
+    driver.goto_waypoint()
+    return True
 
 def land_it(req):
-	if req.command == roscopter.srv.XBEECommand.STARTMISSION:
-		driver.land()	
+    driver.land()
+    return True
 
+def land_failsafe(req):
+    driver.failsafe_land()
+    return True
 
 ##******************************************************************************
 # Services for APM Commands
 #*******************************************************************************
 # Allow for commands such as Arm, Disarm, Launch, Land, etc.
 rospy.Service("mission", roscopter.srv.APMCommand, start_mission)
-rospy.Service("land", roscopter.srv.XBEECommand, land_it)
+rospy.Service("land", Empty, land_it)
+rospy.Service("land_failsafe", Empty, land_failsafe)
 
 
 if __name__ == '__main__':
