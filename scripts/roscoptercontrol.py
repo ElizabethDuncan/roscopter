@@ -27,11 +27,11 @@ def start_mission(req):
 
 def land_it(req):
     driver.land()
-    return True
+    return []
 
 def land_failsafe(req):
     driver.failsafe_land()
-    return True
+    return []
 
 ##******************************************************************************
 # Services for APM Commands

@@ -18,7 +18,7 @@ def arm():
         print "trying to arm"
         command = rospy.ServiceProxy('command', roscopter.srv.APMCommand)
         res = command(3)
-        print type(res), res
+        print 'res:', res
         if str(res) == "result: True":
             print "successfully armed"
             return True
@@ -26,6 +26,7 @@ def arm():
             print "error arming"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 # TODO look at the launch code - how high is it going to go
@@ -35,7 +36,7 @@ def launch():
     try:
         command = rospy.ServiceProxy('command', roscopter.srv.APMCommand)
         res = command(1)
-        print res
+        print 'res:', res
         if str(res) == "result: True":
             print "successfully launching"
             return True
@@ -43,6 +44,7 @@ def launch():
             print "error launching"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 def land():
@@ -60,6 +62,7 @@ def land():
             print "error landing"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 def land_failsafe():
@@ -68,6 +71,7 @@ def land_failsafe():
     try:
         command = rospy.ServiceProxy('land_failsafe', Empty)
         res = command()
+        print 'res:', res
         if str(res) == "result: True":
             print "successfully landing"
             return True
@@ -75,6 +79,7 @@ def land_failsafe():
             print "error landing"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 from collections import namedtuple
@@ -101,6 +106,7 @@ def send_waypoint(wp):
                 print "error sending waypoint"
                 return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 
@@ -125,6 +131,7 @@ def get_gps():
         message = rospy.Subscriber("gps", NavSatFix, gps_received)
         return message
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 
@@ -134,6 +141,7 @@ def return_control():
     try:
         command = rospy.ServiceProxy('command', roscopter.srv.APMCommand)
         res = command(10)
+        print 'res:', res
         if str(res) == "result: True":
             print "successfully returning control"
             return True
@@ -141,6 +149,7 @@ def return_control():
             print "error returning control"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 
@@ -159,6 +168,7 @@ def start_mission():
             print "error starting mission"
             return False
     except rospy.ServiceException, e:
+        print "Error: ", e
         return False
 
 
@@ -166,9 +176,17 @@ if __name__ == "__main__":
 
     wp = Waypoint(42.2914092, -71.2624439, 5000, 10, 10, 10, 10, 10, 10, 1)
 
-    if arm() and launch() and land():
-        print "mission successfull"
+    if arm() and launch():
+        print "Starting wait 0/30"
+        rospy.sleep(10)
+        print "At wait 10/30"
+        rospy.sleep(10)
+        print "At wait 20/30"
+        rospy.sleep(10)
+        print "Landing"
+        rospy.sleep(1)
+        if land():
+            print "mission successfull"
     else:
-        # return_control()
         print "mission failure"
         
