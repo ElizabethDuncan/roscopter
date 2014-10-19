@@ -8,8 +8,8 @@ import roscopter.srv
 import sys,struct,time,os
 import math
 import xmlrpclib
-
 #import driver
+
 
 def arm():
     rospy.loginfo("in arm")
@@ -82,9 +82,6 @@ def land_failsafe():
         print "Error: ", e
         return False
 
-from collections import namedtuple
-Waypoint = namedtuple('Waypoint', 'latitude longitude altitude pos_acc speed_to hold_time yaw_from pan_angle tilt_angle waypoint_type')
-
 
 def send_waypoint(wp):
     print "in send waypoint"
@@ -110,23 +107,29 @@ def send_waypoint(wp):
         return False
 
 
+current_gps = None
+target_wp = None
+
+
 def use_gps_to_set_waypoint():
-    gps = get_gps()
     # Create new  Waypoint
     new_wp = roscopter.msg.Waypoint()
     #increment latitiude by just a little
-    new_wp.latitude = gps.latitude + 0.0001
-    new_wp.longitude = gps.longitude
-    new_wp.altitude = gps
+    new_wp.latitude = (current_gps.latitude - 0.00002) * 1e+7
+    new_wp.longitude = (current_gps.longitude - 0.00002) * 1e+7
+    new_wp.altitude = 6000
     new_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_NAV
 
+    global target_wp
+    target_wp = new_wp
     send_waypoint(new_wp)
 
 def gps_received(data):
-    return data
+    global current_gps
+    current_gps = data
 
 def get_gps():
-    rospy.wait_for_topic('gps')
+    rospy.wait_for_message('gps', NavSatFix)
     try:
         message = rospy.Subscriber("gps", NavSatFix, gps_received)
         return message
@@ -174,11 +177,14 @@ def start_mission():
 
 if __name__ == "__main__":
 
-    wp = Waypoint(42.2914092, -71.2624439, 5000, 10, 10, 10, 10, 10, 10, 1)
-
-    if arm() and launch():
+    #wp = Waypoint(42.2926476, -71.2629756, 5000, 10, 10, 10, 10, 10, 10, 1)
+    rospy.init_node("hello")
+    if arm() and get_gps() and launch():
         print "Starting wait 0/30"
         rospy.sleep(10)
+
+        use_gps_to_set_waypoint()
+
         print "At wait 10/30"
         rospy.sleep(10)
         print "At wait 20/30"
