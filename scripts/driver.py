@@ -856,7 +856,7 @@ def watchdog_cb(msg):
 # Sensor messages
 pub_gps = rospy.Publisher('gps', NavSatFix, queue_size = 1)
 #pub_imu = rospy.Publisher('imu', Imu, queue_size = 1)
-pub_rc = rospy.Publisher('rc', roscopter.msg.RC)
+pub_rc = rospy.Publisher('rc', roscopter.msg.RC, queue_size = 1)
 pub_state = rospy.Publisher('state', roscopter.msg.State, queue_size = 1)
 pub_vfr_hud = rospy.Publisher('vfr_hud', roscopter.msg.VFR_HUD, queue_size = 1)
 pub_attitude = rospy.Publisher('attitude', roscopter.msg.Attitude, queue_size = 1)
