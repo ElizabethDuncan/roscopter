@@ -66,11 +66,11 @@ def land():
         print "Error: ", e
         return False
 
-def land_failsafe():
-    print "in land_failsafe"
-    rospy.wait_for_service('command')
+def waypoint_test():
+    print "in waypoint_test"
+    rospy.wait_for_service('waypoint_test')
     try:
-        command = rospy.ServiceProxy('land_failsafe', Empty)
+        command = rospy.ServiceProxy('waypoint_test', Empty)
         res = command()
         print 'res:', res
         if str(res) == "result: True":
@@ -158,7 +158,7 @@ def return_control():
         print "Error: ", e
         return False
 
-
+# Only works for Empty type services
 def start_mission():
     rospy.loginfo("in start mission")
     rospy.wait_for_service('mission')
@@ -177,26 +177,45 @@ def start_mission():
         print "Error: ", e
         return False
 
+def call_service(service_name):
+    rospy.loginfo("call service calling" + str(service_name))
+    rospy.wait_for_service(str(service_name))
+    try:
+        print "trying to start " + str(service_name)
+        mission = rospy.ServiceProxy(str(service_name), Empty)
+        res = mission()
+        print "sent command to " + str(service_name)
+    except rospy.ServiceException, e:
+        print "Error: ", e
+        return False
+
+import time
+
 
 if __name__ == "__main__":
-
-    #wp = Waypoint(42.2926476, -71.2629756, 5000, 10, 10, 10, 10, 10, 10, 1)
     rospy.init_node("hello")
 
-    if arm() and get_gps() and launch():
-        print "Starting wait 0/30"
-        rospy.sleep(10)
+    new_wp = roscopter.msg.Waypoint()
+    new_wp.latitude = int(42.2926834 * 1e+7)
+    new_wp.longitude = int(-71.2628237 * 1e+7)
+    new_wp.altitude = 5000
+    new_wp.hold_time = (3 * 1000)
+    new_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_NAV
+    new_wp2 = roscopter.msg.Waypoint()
+    new_wp2.latitude = int(42.2925417 * 1e+7)
+    new_wp2.longitude = int(-71.2628411 * 1e+7)
+    new_wp2.altitude = 5000
+    new_wp2.hold_time = (3 * 1000)
+    new_wp2.waypoint_type = roscopter.msg.Waypoint.TYPE_NAV
 
-        driver.test_send_waypoint()
-
-        print "At wait 10/30"
-        rospy.sleep(10)
-        print "At wait 20/30"
-        rospy.sleep(10)
-        print "Landing"
-        rospy.sleep(1)
-        #if land():
-            #print "mission successfull"
+    if arm() and launch() and send_waypoint(new_wp):
+        call_service("trigger_auto")
+        # call_service("adjust_throttle")
+        # start_mission()
+        time.sleep(15)
+        send_waypoint(new_wp2)
+        time.sleep(15)
+        land()
     else:
         print "mission failure"
         

@@ -29,8 +29,12 @@ def land_it(req):
     driver.land()
     return []
 
-def land_failsafe(req):
-    driver.failsafe_land()
+def adjust_throttle(req):
+    driver.adjust_throttle()
+    return []
+
+def trigger_auto(req):
+    driver.trigger_auto()
     return []
 
 ##******************************************************************************
@@ -39,7 +43,8 @@ def land_failsafe(req):
 # Allow for commands such as Arm, Disarm, Launch, Land, etc.
 rospy.Service("mission", roscopter.srv.APMCommand, start_mission)
 rospy.Service("land", Empty, land_it)
-rospy.Service("land_failsafe", Empty, land_failsafe)
+rospy.Service("adjust_throttle", Empty, adjust_throttle)
+rospy.Service("trigger_auto", Empty, trigger_auto)
 
 
 if __name__ == '__main__':
