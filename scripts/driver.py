@@ -782,6 +782,88 @@ def launch():
 
     return True
     
+
+##******************************************************************************
+ # Name:    test_send_waypoin
+ # Purpose: Send a Waypoint.  Based off of launch command
+ #Sample latitiude: 9.9 * 10-5
+#        longitutde: 1.5 * 10-4
+#*******************************************************************************
+def test_send_waypoint():
+    rospy.loginfo("Send waypoint Vehicle")
+    pring("sending waypoint")
+
+    lat_increment = 2e-5
+    long_increment =  2e-5
+
+    # Number of waypoints (Plus Dummy Waypoint)
+    master.mav.mission_count_send(master.target_system, master.target_component, 2)
+
+    # Send Dummy Waypoint
+    dummy_wp = roscopter.msg.Waypoint()
+    dummy_wp.latitude = gps_msg.latitude + lat_increment
+    dummy_wp.longitude = gps_msg.longitude + long_increment
+    dummy_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_TAKEOFF
+    
+    if (not transmit_waypoint(dummy_wp, 0)):
+        rospy.loginfo("Landpoint Failed")
+        return False
+
+    # Send Launch Waypoint
+    launch_wp = roscopter.msg.Waypoint()
+    launch_wp.latitude = gps_msg.latitude + lat_increment
+    launch_wp.longitude = gps_msg.longitude + long_increment
+    launch_wp.altitude = opts.launch_altitude
+    launch_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_TAKEOFF
+    
+    if (not transmit_waypoint(launch_wp, 1)):
+        rospy.loginfo("Landpoint Failed")
+        return False
+
+    # Set Launch Waypoint as Current Waypoint
+    set_current_waypoint(1)
+    
+    # Trigger auto mode for launch command
+    master.mav.set_mode_send(master.target_system, mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, AUTO)
+    rospy.sleep(0.1)
+    master.mav.set_mode_send(master.target_system, mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, AUTO)
+    
+    # Loop until Auto is set or timeout
+    start_time = rospy.Time.from_sec(time.time()).to_nsec()
+
+    while (not state_msg.mode == "AUTO"):
+        if (not (start_time + opts.mode_timeout*1000000) > rospy.Time.from_sec(time.time()).to_nsec()):
+            rospy.loginfo("Timed out while setting AUTO")
+            return False
+
+        rospy.sleep(0.01)
+
+    # Slightly adjust throttle to trigger auto mode.
+    master.mav.rc_channels_override_send(master.target_system, master.target_component, 65535, 65535, 1200, 65535, 65535, 65535, 65535, 65535)
+    rospy.sleep(1)
+    master.mav.rc_channels_override_send(master.target_system, master.target_component, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    start_time = rospy.Time.from_sec(time.time()).to_nsec()
+
+    # THIS WAS WRONG, DOES NOT SWITCH TO LOITER.
+    # INSTEAD, USE TIMER TO SPECIFY HOW LONG LAUNCH SHOULD TAKE
+    # Once Launched, mode should be auto until launch is complete, resulting
+    # in setting to "LOITER".
+    # Loop until mode is set or timeout
+    while ((start_time + opts.launch_timeout*1000000) > rospy.Time.from_sec(time.time()).to_nsec()):
+        rospy.sleep(0.01)
+    
+#    while (not state_msg.mode == "LOITER"):
+#        if (not (start_time + opts.launch_timeout*1000000) > rospy.Time.from_sec(time.time()).to_nsec()):
+#            rospy.loginfo("Timed out while launching")
+#            return False
+
+#        rospy.sleep(0.01)
+
+    rospy.loginfo ("Vehicle Landpoint sent")
+    print ("landpoint sent")
+
+    return True
 # Land the vehicle
 def land():
     print "overwrite rc..."

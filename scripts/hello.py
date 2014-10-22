@@ -8,6 +8,7 @@ import roscopter.srv
 import sys,struct,time,os
 import math
 import xmlrpclib
+import ctypes
 #import driver
 
 
@@ -115,9 +116,11 @@ def use_gps_to_set_waypoint():
     # Create new  Waypoint
     new_wp = roscopter.msg.Waypoint()
     #increment latitiude by just a little
-    new_wp.latitude = (current_gps.latitude - 0.00002) * 1e+7
-    new_wp.longitude = (current_gps.longitude - 0.00002) * 1e+7
-    new_wp.altitude = 6000
+    new_wp.latitude = int((current_gps.latitude - 0.00002) * 1e+7)
+    new_wp.longitude = int((current_gps.longitude - 0.00002) * 1e+7)
+    print "raw_alt", current_gps.altitude
+    new_wp.altitude = current_gps.altitude*100
+    new_wp.hold_time = (1 * 10000)
     new_wp.waypoint_type = roscopter.msg.Waypoint.TYPE_NAV
 
     global target_wp
@@ -179,11 +182,12 @@ if __name__ == "__main__":
 
     #wp = Waypoint(42.2926476, -71.2629756, 5000, 10, 10, 10, 10, 10, 10, 1)
     rospy.init_node("hello")
+
     if arm() and get_gps() and launch():
         print "Starting wait 0/30"
         rospy.sleep(10)
 
-        use_gps_to_set_waypoint()
+        driver.test_send_waypoint()
 
         print "At wait 10/30"
         rospy.sleep(10)
@@ -191,8 +195,8 @@ if __name__ == "__main__":
         rospy.sleep(10)
         print "Landing"
         rospy.sleep(1)
-        if land():
-            print "mission successfull"
+        #if land():
+            #print "mission successfull"
     else:
         print "mission failure"
         
