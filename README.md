@@ -2,7 +2,7 @@ Installation Instructions
 =======================
 
 * Clone or fork this repo!
-* 
+
 > git clone https://github.com/ElizabethDuncan/roscopter.git
 
 * Navigate to repo folder (called 'roscopter')
