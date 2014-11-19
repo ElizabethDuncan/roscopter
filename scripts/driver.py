@@ -455,7 +455,7 @@ def transmit_waypoint(data, index):
     if (data.waypoint_type == roscopter.msg.Waypoint.TYPE_NAV):
         master.mav.mission_item_send(master.target_system, master.target_component, 
                                      index,              # Waypoint Number
-                                     mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,  # Frame
+                                     data.waypoint_frame,
                                      mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, # Mission Item Type
                                      0,                  # Is Current Waypoint
                                      1,                  # Should Autocontinue to next wp
@@ -590,14 +590,30 @@ def send_setpoint_cb(req):
         if (not autonomous_enable):
             return False
 
-    return master.mav.set_position_target_local_ned_send(0 # time_boot_ms
+    master.mav.set_position_target_local_ned_send(0, # time_boot_ms
         master.target_system, master.target_component,
         req.setpoint.coordinate_frame,
         req.setpoint.type_mask,
         req.setpoint.x, req.setpoint.y, req.setpoint.z,
         req.setpoint.vx, req.setpoint.vy, req.setpoint.vz,
         req.setpoint.ax, req.setpoint.ay, req.setpoint.az,
-        req.yaw, req.yaw_rate)
+        req.setpoint.yaw, req.setpoint.yaw_rate)
+    return True
+
+
+def set_offboard_cb(req):
+    # Look at autonomous safety switch, if the switch is not enabled, return 
+    # False.  If not looking at safety switch or it is enabled, then complete
+    # the desired behavior.
+    if (opts.enable_autonomous_safety_switch):
+        if (not autonomous_enable):
+            return False
+
+    master.mav.command_long_send(master.target_system, master.target_component,
+                                 mavutil.mavlink.MAV_CMD_NAV_GUIDED_ENABLE, 0, 1 if req else 0,
+                                 0, 0, 0,
+                                 0, 0, 0)
+    return True
 
 
 ##******************************************************************************
@@ -905,6 +921,7 @@ pub_waypoint_reached = rospy.Publisher('waypoint_reached', Int32, queue_size = 1
 # Allow for commands such as Arm, Disarm, Launch, Land, etc.
 rospy.Service("command", roscopter.srv.APMCommand, command_cb)
 rospy.Service("send_setpoint", roscopter.srv.SendSetpoint, send_setpoint_cb)
+rospy.Service("set_offboard", Bool, set_offboard_cb)
 
 ##******************************************************************************
 # Start Heartbeat subscriber and timer

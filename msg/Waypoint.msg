@@ -24,7 +24,20 @@ int32 tilt_angle
 # Type of Waypoint
 uint8 waypoint_type
 
+# Coordinate frame to use
+uint8 waypoint_frame
+
 uint8 TYPE_NAV = 1
 uint8 TYPE_CONDITION_YAW = 2
 uint8 TYPE_CONDITION_CHANGE_ALT = 3
 uint8 TYPE_TAKEOFF = 4
+
+uint8 MAV_FRAME_GLOBAL = 0
+uint8 MAV_FRAME_LOCAL_NED = 1
+uint8 MAV_FRAME_MISSION = 2
+uint8 MAV_FRAME_GLOBAL_RELATIVE_ALT = 3
+uint8 MAV_FRAME_LOCAL_ENU = 4
+uint8 MAV_FRAME_LOCAL_OFFSET_NED = 7
+uint8 MAV_FRAME_BODY_NED = 8
+uint8 MAV_FRAME_BODY_OFFSET_NED = 9
+uint8 MAV_FRAME_GLOBAL_TERRAIN_ALT = 10

@@ -27,6 +27,7 @@ add_message_files(
   Mavlink_RAW_IMU.msg
   MissionItem.msg
   RC.msg
+  Setpoint.msg
   State.msg
   Status.msg
   VFR_HUD.msg
@@ -38,6 +39,7 @@ add_message_files(
 add_service_files(
   FILES
   APMCommand.srv
+  SendSetpoint.srv
   SendWaypoint.srv
   SendWaypointList.srv
   XBEECommand.srv
