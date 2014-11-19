@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from std_msgs.msg import String, Header, Bool
+from std_msgs.msg import String, Header, Bool, Int32
 from std_srvs.srv import *
 from sensor_msgs.msg import NavSatFix, NavSatStatus, Imu
 import roscopter.msg
@@ -582,6 +582,24 @@ def waypoint_cb(req):
     return True
 
 
+def send_setpoint_cb(req):
+    # Look at autonomous safety switch, if the switch is not enabled, return 
+    # False.  If not looking at safety switch or it is enabled, then complete
+    # the desired behavior.
+    if (opts.enable_autonomous_safety_switch):
+        if (not autonomous_enable):
+            return False
+
+    return master.mav.set_position_target_local_ned_send(0 # time_boot_ms
+        master.target_system, master.target_component,
+        req.setpoint.coordinate_frame,
+        req.setpoint.type_mask,
+        req.setpoint.x, req.setpoint.y, req.setpoint.z,
+        req.setpoint.vx, req.setpoint.vy, req.setpoint.vz,
+        req.setpoint.ax, req.setpoint.ay, req.setpoint.az,
+        req.yaw, req.yaw_rate)
+
+
 ##******************************************************************************
  # Name:    waypoint_list_cb
  # Purpose: Callback function for "waypoint_list".  Initially transmit dummy
@@ -879,12 +897,14 @@ pub_filtered_pos = rospy.Publisher('filtered_pos', roscopter.msg.FilteredPositio
 pub_control_output = rospy.Publisher('controller_output', roscopter.msg.ControllerOutput, queue_size = 1)
 pub_current_mission = rospy.Publisher('current_mission', roscopter.msg.CurrentMission, queue_size = 1)
 pub_mission_item = rospy.Publisher('mission_item', roscopter.msg.MissionItem, queue_size = 1)
+pub_waypoint_reached = rospy.Publisher('waypoint_reached', Int32, queue_size = 1)
 
 ##******************************************************************************
 # Services for APM Commands
 #*******************************************************************************
 # Allow for commands such as Arm, Disarm, Launch, Land, etc.
 rospy.Service("command", roscopter.srv.APMCommand, command_cb)
+rospy.Service("send_setpoint", roscopter.srv.SendSetpoint, send_setpoint_cb)
 
 ##******************************************************************************
 # Start Heartbeat subscriber and timer
@@ -1139,6 +1159,9 @@ def mainloop():
             elif msg_type == "PARAM_VALUE":
                 rospy.loginfo ("PARAM_VALUE: ID = %s, Value = %d, Type = %d, Count = %d, Index = %d"
                     %(msg.param_id, msg.param_value, msg.param_type, msg.param_count, msg.param_index))
+
+            elif msg_type == "WAYPOINT_REACHED":
+                pub_waypoint_reached.publish(msg.seq)
 
             #else:
             #    # Message not being processed received
