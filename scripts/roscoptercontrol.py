@@ -37,6 +37,10 @@ def trigger_auto(req):
     driver.trigger_auto()
     return []
 
+def clear_waypoints(req):
+    driver.clear_waypoints()
+    return []
+
 ##******************************************************************************
 # Services for APM Commands
 #*******************************************************************************
@@ -45,6 +49,7 @@ rospy.Service("mission", roscopter.srv.APMCommand, start_mission)
 rospy.Service("land", Empty, land_it)
 rospy.Service("adjust_throttle", Empty, adjust_throttle)
 rospy.Service("trigger_auto", Empty, trigger_auto)
+rospy.Service("clear_waypoints", Empty, clear_waypoints)
 
 
 if __name__ == '__main__':
