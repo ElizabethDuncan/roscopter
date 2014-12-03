@@ -41,6 +41,10 @@ def clear_waypoints(req):
     driver.clear_waypoints()
     return []
 
+def num_of_waypoints(req):
+    driver.num_of_waypoints()
+    return []
+
 ##******************************************************************************
 # Services for APM Commands
 #*******************************************************************************
@@ -50,6 +54,7 @@ rospy.Service("land", Empty, land_it)
 rospy.Service("adjust_throttle", Empty, adjust_throttle)
 rospy.Service("trigger_auto", Empty, trigger_auto)
 rospy.Service("clear_waypoints", Empty, clear_waypoints)
+rospy.Service("num_of_waypoints", Empty, num_of_waypoints)
 
 
 if __name__ == '__main__':
