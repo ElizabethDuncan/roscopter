@@ -619,7 +619,7 @@ def waypoint_list_cb(req):
         for i in range(0, sizeOfWaypointList):
             # Check and confirm altitude of each waypoint is greater than minimum altitude
             # if using ArduCopter
-            if (req.waypoint[i].altitude < opts.minimum_mission_altitude):
+            if (req.waypoints[i].altitude < opts.minimum_mission_altitude):
                 rospy.loginfo("Waypoint Altitude below minimum allowable altitude")
                 return False
                     
