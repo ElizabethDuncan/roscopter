@@ -508,6 +508,20 @@ def transmit_waypoint(data, index):
                                      0,                  # Empty
                                      0,                  # Empty
                                      data.altitude/1000) # Finish Altitude (m)
+    elif (data.waypoint_type == roscopter.msg.Waypoint.TYPE_RELATIVE_NAV):
+        master.mav.mission_item_send(master.target_system, master.target_component, 
+                                     index,              # Waypoint Number
+                                     mavutil.mavlink.MAV_FRAME_LOCAL_ENU,  # Frame - ENU = East, North, Up
+                                     mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, # Mission Item Type
+                                     0,                  # Is Current Waypoint
+                                     1,                  # Should Autocontinue to next wp
+                                     data.hold_time/1000,# Hold Time (convert from ms to seconds)
+                                     0,                  # Pos Acc Not used on APM
+                                     0,                  # Orbit Not used on APM
+                                     0,                  # Yaw Not used on APM
+                                     data.latitude/1E7,  # local: x position, global: latitude
+                                     data.longitude/1E7, # local: y position, global: longitude
+                                     data.altitude/1000) # local: z position, global: altitude (convert from mm to meters)
     else:
         rospy.loginfo("Type of waypoint incorrect")
         return False
