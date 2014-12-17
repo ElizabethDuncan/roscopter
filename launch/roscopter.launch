@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="roscopter" type="roscoptercontrol.py" name="roscopter" output="screen" args="--device=/dev/ttyUSB0 --baudrate=57600 --enable-rc-control=true --enable-waypoint-control=true --minimum-waypoint-altitude=1000">
+  <node pkg="roscopter" type="roscoptercontrol.py" name="roscopter" output="screen" args="--device=/dev/ttyUSB3 --baudrate=57600 --enable-rc-control=true --enable-waypoint-control=true">
   </node>
 </launch>
 
