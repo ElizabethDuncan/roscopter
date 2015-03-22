@@ -32,6 +32,10 @@ Navigate back to Catkin folder and run 'catkin_make'.
 `cd ~/catkin_ws/`  
 `catkin_make`  
 
+Add your user to the dialout group to have access to the USB radio. This may require reboot to take effect.
+
+`sudo adduser $USER dialout`  
+
 Note
 =======================
 Use in conjuction with https://github.com/hboortz/arl-scope for autonomous quadcopter control/missions.
