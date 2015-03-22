@@ -30,7 +30,7 @@ Build mavlink.
 Navigate back to Catkin folder and run 'catkin_make'.  
 
 `cd ~/catkin_ws/`  
-``catkin_make`  
+`catkin_make`  
 
 Note
 =======================
